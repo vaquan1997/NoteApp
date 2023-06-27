@@ -5,8 +5,8 @@ const Note = ({ title, content, onDelete, onPress }) => {
   return (
     <TouchableOpacity style={styles.noteContainer} onPress={onPress}>
       <View>
-        <Text style={styles.noteTitle}>{title}</Text>
-        <Text style={styles.noteContent}>{content}</Text>
+      <Text style={styles.noteTitle}>{title.toString()}</Text>
+        <Text style={styles.noteContent}>{content.toString()}</Text>
       </View>
       <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
         <Text style={styles.deleteButtonText}>X</Text>

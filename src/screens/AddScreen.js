@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  actions,
+  RichEditor,
+  RichToolbar,
+} from "react-native-pell-rich-editor";
 const AddScreen = ({ navigation, route }) => {
+  const editorRef = useRef(null);
   const { addNote } = route.params;
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
 
-  const saveNote = () => {
+  const handleSaveNote = () => {
     const newNote = {
       id: Date.now().toString(),
       title,
-      content,
+      content: editorRef.current.getContentHtml(),
     };
     addNote && addNote(newNote);
     navigation.goBack();
@@ -25,14 +30,37 @@ const AddScreen = ({ navigation, route }) => {
         placeholder="Title"
         autoFocus
       />
-      <TextInput
-        style={styles.input}
-        value={content}
-        onChangeText={setContent}
+      <RichEditor
+        ref={editorRef}
+        style={styles.editor}
         placeholder="Content"
-        multiline
+        initialContentHTML=""
+        editorStyle={{
+          backgroundColor: '#FFFFFF',
+        }}
+        initialHeight={250}
+      >
+        <View />
+      </RichEditor>
+
+
+      <RichToolbar
+        editor={editorRef}
+        selectedIconTint="#873c1e"
+        iconTint="#312921"
+        actions={[
+          actions.insertImage,
+          actions.setBold,
+          actions.setItalic,
+          actions.insertBulletsList,
+          actions.insertOrderedList,
+          actions.insertLink,
+          actions.setStrikethrough,
+          actions.setUnderline,
+        ]}
+        style={styles.richTextToolbarStyle}
       />
-      <TouchableOpacity style={styles.saveButton} onPress={saveNote}>
+      <TouchableOpacity style={styles.saveButton} onPress={handleSaveNote}>
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
     </View>
