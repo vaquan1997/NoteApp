@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import Note from '../components/Note';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ navigation }) => {
   const [notes, setNotes] = useState([]);
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     fetchNotes();
@@ -57,13 +58,27 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const handleSearch = (text) => {
+    setSearchText(text);
+  };
+
+  const filteredNotes = notes.filter((note) =>
+    note.title.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
-      {notes.length === 0 ? (
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search by title"
+        onChangeText={handleSearch}
+        value={searchText}
+      />
+      {filteredNotes.length === 0 ? (
         <Text style={styles.noNotesText}>No notes found.</Text>
       ) : (
         <FlatList
-          data={notes}
+          data={filteredNotes}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Note
@@ -98,6 +113,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  searchInput: {
+    marginBottom: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 5,
   },
   noNotesText: {
     fontSize: 18,
