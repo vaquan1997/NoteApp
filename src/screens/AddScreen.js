@@ -10,17 +10,18 @@ const AddScreen = ({ navigation, route }) => {
   const editorRef = useRef(null);
   const { addNote } = route.params;
   const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+
 
   const handleSaveNote = () => {
     const newNote = {
       id: Date.now().toString(),
       title,
-      content: editorRef.current.getContentHtml(),
+      content,
     };
     addNote && addNote(newNote);
     navigation.goBack();
   };
-
   return (
     <View style={styles.container}>
       <TextInput
@@ -39,10 +40,10 @@ const AddScreen = ({ navigation, route }) => {
           backgroundColor: '#FFFFFF',
         }}
         initialHeight={250}
+        onChange={(newContent) => setContent(newContent)}
       >
         <View />
       </RichEditor>
-
 
       <RichToolbar
         editor={editorRef}

@@ -1,12 +1,22 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-
+import { useWindowDimensions } from 'react-native';
+import HTML from 'react-native-render-html';
 const Note = ({ title, content, onDelete, onPress }) => {
+  const windowWidth = useWindowDimensions().width;
   return (
     <TouchableOpacity style={styles.noteContainer} onPress={onPress}>
       <View>
-      <Text style={styles.noteTitle}>{title.toString()}</Text>
-        <Text style={styles.noteContent}>{content.toString()}</Text>
+        <HTML
+          source={{ html: title }}
+          contentWidth={windowWidth}
+          baseFontStyle={styles.noteTitle}
+        />
+        <HTML
+          source={{ html: content }}
+          contentWidth={windowWidth}
+          baseFontStyle={styles.noteContent}
+        />
       </View>
       <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
         <Text style={styles.deleteButtonText}>X</Text>
