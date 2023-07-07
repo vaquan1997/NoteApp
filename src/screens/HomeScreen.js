@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState  } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import Note from '../components/Note';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useIsFocused } from '@react-navigation/native';
 const HomeScreen = ({ navigation }) => {
   const [notes, setNotes] = useState([]);
   const [searchText, setSearchText] = useState('');
-
+  const isFocused = useIsFocused();
   useEffect(() => {
     fetchNotes();
-  }, []);
+  }, [isFocused]);
 
-  useEffect(() => {
-    saveNotes();
-  }, [notes]);
+
 
   const fetchNotes = async () => {
     try {
@@ -38,32 +36,22 @@ const HomeScreen = ({ navigation }) => {
   const deleteNote = async (id) => {
     try {
       const updatedNotes = notes.filter((note) => note.id !== id);
-      setNotes(updatedNotes);
+      await AsyncStorage.setItem('@notes', JSON.stringify(updatedNotes));
+      await setNotes(updatedNotes);
     } catch (error) {
       console.log('Error deleting note:', error);
     }
   };
 
-  const updateNote = async (id, updatedNote) => {
-    try {
-      const updatedNotes = notes.map((note) => {
-        if (note.id === id) {
-          return updatedNote;
-        }
-        return note;
-      });
-      setNotes(updatedNotes);
-    } catch (error) {
-      console.log('Error updating note:', error);
-    }
-  };
+  
 
   const handleSearch = (text) => {
     setSearchText(text);
   };
 
   const filteredNotes = notes.filter((note) =>
-    note.title.toLowerCase().includes(searchText.toLowerCase())
+    note.title.toLowerCase().includes(searchText.toLowerCase()) ||
+    note.content.toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
@@ -87,24 +75,13 @@ const HomeScreen = ({ navigation }) => {
               onDelete={() => deleteNote(item.id)}
               onPress={() =>
                 navigation.navigate('Edit', {
-                  note: item,
-                  updateNote: (updatedNote) => updateNote(item.id, updatedNote),
+                  note: {...item},
                 })
               }
             />
           )}
         />
       )}
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() =>
-          navigation.navigate('Add', {
-            addNote: (newNote) => setNotes([...notes, newNote]),
-          })
-        }
-      >
-        <Text style={styles.addButtonText}>+</Text>
-      </TouchableOpacity>
     </View>
   );
 };

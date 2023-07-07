@@ -1,33 +1,67 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useState, useEffect, useRef} from 'react';
 import {
-  actions,
-  RichEditor,
-  RichToolbar,
-} from "react-native-pell-rich-editor";
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  useWindowDimensions,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {actions, RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
+import {useIsFocused} from '@react-navigation/native';
 
-const EditScreen = ({ route, navigation }) => {
-  const { note, updateNote } = route.params;
-  const [title, setTitle] = useState(note.title);
-  const [content, setContent] = useState(note.content);
+const EditScreen = ({route, navigation}) => {
+  const {note} = route.params;
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const editorRef = useRef(null);
   const windowWidth = useWindowDimensions().width;
-
+  const isFocused = useIsFocused();
+  const fetchNotes = async () => {
+    try {
+      const existingNotes = await AsyncStorage.getItem('@notes');
+      if (existingNotes) {
+        const parsedNotes = JSON.parse(existingNotes);
+        return parsedNotes;
+      }
+    } catch (error) {
+      return [];
+    }
+  };
+  const updateNote = async (id, updatedNote) => {
+    try {
+      let notes = await fetchNotes();
+      const index = notes.findIndex(note => {
+        return note.id == id;
+      });
+      notes[index] = updatedNote;
+      await AsyncStorage.setItem('@notes', JSON.stringify(notes));
+    } catch (error) {
+      console.log('Error updating note:', error);
+    }
+  };
   useEffect(() => {
-    setContent(note.content);
-  }, [note.content]);
+    setTitle(note.title)
+    editorRef.current.sendAction('content', 'setHtml', note.content)
+  }, [isFocused]);
 
-  const saveNote = () => {
+  const saveNote = async () => {
     const updatedNote = {
       ...note,
       title,
       content,
     };
-    updateNote && updateNote(updatedNote);
+    await updateNote(note.id, updatedNote);
     navigation.goBack();
   };
 
+  const editorInitializedCallback = () => {
+    console.log('====================================');
+    console.log(note.content);
+    console.log('====================================');
+    editorRef.current.insertHTML(note.content);
+  };
   return (
     <View style={styles.container}>
       <TextInput
@@ -37,19 +71,21 @@ const EditScreen = ({ route, navigation }) => {
         placeholder="Title"
         autoFocus
       />
+
       {/* Rich Editor */}
       <RichEditor
         ref={editorRef}
         style={styles.editor}
-        initialContentHTML={content}
+        // editorInitializedCallback={editorInitializedCallback}
+        initialFocus={false}
+        firstFocusEnd={false}
         placeholder="Content"
         editorStyle={{
           backgroundColor: '#FFFFFF',
         }}
         initialHeight={250}
         contentWidth={windowWidth}
-        onChange={(newContent) => setContent(newContent)}
-      >
+        onChange={newContent => setContent(newContent)}>
         <View />
       </RichEditor>
 

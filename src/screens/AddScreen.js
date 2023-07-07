@@ -8,18 +8,32 @@ import {
 } from "react-native-pell-rich-editor";
 const AddScreen = ({ navigation, route }) => {
   const editorRef = useRef(null);
-  const { addNote } = route.params;
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const fetchNotes = async () => {
+    try {
+      const existingNotes = await AsyncStorage.getItem('@notes');
+      if (existingNotes) {
+        const parsedNotes = JSON.parse(existingNotes);
+        return parsedNotes;
+      }
+    } catch (error) {
+      return [];
+    }
+  };
 
-
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     const newNote = {
       id: Date.now().toString(),
       title,
       content,
     };
-    addNote && addNote(newNote);
+    let notes = [...await fetchNotes(),newNote];
+    await AsyncStorage.setItem('@notes', JSON.stringify(notes));
+    setTitle('')
+    setContent('')
+    editorRef.current.sendAction('content', 'setHtml','')
+    
     navigation.goBack();
   };
   return (

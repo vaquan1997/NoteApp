@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   noteTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   noteContent: {
