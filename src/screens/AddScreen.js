@@ -6,6 +6,8 @@ import {
   RichEditor,
   RichToolbar,
 } from "react-native-pell-rich-editor";
+import FeatherIcon from 'react-native-vector-icons/Feather';
+
 const AddScreen = ({ navigation, route }) => {
   const editorRef = useRef(null);
   const [title, setTitle] = useState('');
@@ -28,16 +30,19 @@ const AddScreen = ({ navigation, route }) => {
       title,
       content,
     };
-    let notes = [...await fetchNotes(),newNote];
+    let notes = [...await fetchNotes(), newNote];
     await AsyncStorage.setItem('@notes', JSON.stringify(notes));
     setTitle('')
     setContent('')
-    editorRef.current.sendAction('content', 'setHtml','')
-    
+    editorRef.current.sendAction('content', 'setHtml', '')
+
     navigation.goBack();
   };
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.saveButton} onPress={handleSaveNote}>
+        <FeatherIcon name='save' size={30} color={'black'} />
+      </TouchableOpacity>
       <TextInput
         style={styles.input}
         value={title}
@@ -51,7 +56,9 @@ const AddScreen = ({ navigation, route }) => {
         placeholder="Content"
         initialContentHTML=""
         editorStyle={{
-          backgroundColor: '#FFFFFF',
+          borderWidth: 0,
+          borderColor: 'transparent',
+          backgroundColor: 'transparent',
         }}
         initialHeight={250}
         onChange={(newContent) => setContent(newContent)}
@@ -75,9 +82,6 @@ const AddScreen = ({ navigation, route }) => {
         ]}
         style={styles.richTextToolbarStyle}
       />
-      <TouchableOpacity style={styles.saveButton} onPress={handleSaveNote}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -90,15 +94,22 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 20,
     fontSize: 18,
-    borderBottomWidth: 1,
     borderBottomColor: '#CCCCCC',
   },
-  saveButton: {
-    marginRight: 10,
+  editor: {
+    borderWidth: 0,
+    borderColor: '#CCCCCC',
+    borderRadius: 5,
+    marginBottom: 20,
   },
-  saveButtonText: {
-    fontSize: 16,
-    color: '#007AFF',
+  saveButton: {
+    marginLeft: 340,
+    width: 30,
+  },
+  richTextToolbarStyle: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#888',
+    backgroundColor: '#f5f5f5',
   },
 });
 

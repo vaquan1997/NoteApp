@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,11 +8,12 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {actions, RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
-import {useIsFocused} from '@react-navigation/native';
+import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
+import { useIsFocused } from '@react-navigation/native';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
-const EditScreen = ({route, navigation}) => {
-  const {note} = route.params;
+const EditScreen = ({ route, navigation }) => {
+  const { note } = route.params;
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const editorRef = useRef(null);
@@ -64,6 +65,12 @@ const EditScreen = ({route, navigation}) => {
   };
   return (
     <View style={styles.container}>
+
+      <TouchableOpacity style={styles.saveButton} onPress={saveNote}>
+
+        <FeatherIcon name='save' size={30} color={'black'} />
+      </TouchableOpacity>
+
       <TextInput
         style={styles.input}
         value={title}
@@ -76,16 +83,18 @@ const EditScreen = ({route, navigation}) => {
       <RichEditor
         ref={editorRef}
         style={styles.editor}
-        // editorInitializedCallback={editorInitializedCallback}
         initialFocus={false}
         firstFocusEnd={false}
         placeholder="Content"
         editorStyle={{
-          backgroundColor: '#FFFFFF',
+          borderWidth: 0,
+          borderColor: 'transparent',
+          backgroundColor: 'transparent',
         }}
         initialHeight={250}
         contentWidth={windowWidth}
-        onChange={newContent => setContent(newContent)}>
+        onChange={newContent => setContent(newContent)}
+      >
         <View />
       </RichEditor>
 
@@ -107,9 +116,7 @@ const EditScreen = ({route, navigation}) => {
         style={styles.richTextToolbarStyle}
       />
 
-      <TouchableOpacity style={styles.saveButton} onPress={saveNote}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
+
     </View>
   );
 };
@@ -122,22 +129,23 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 20,
     fontSize: 18,
-    borderBottomWidth: 1,
     borderBottomColor: '#CCCCCC',
   },
   editor: {
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: '#CCCCCC',
     borderRadius: 5,
     marginBottom: 20,
   },
   saveButton: {
-    marginRight: 10,
+    marginLeft: 340,
+    width: 30,
   },
   saveButtonText: {
     fontSize: 16,
     color: '#007AFF',
   },
+
   richTextToolbarStyle: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#888',
